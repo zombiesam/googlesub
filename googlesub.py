@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Coded by Sam (info@sam3.se)
+# http://0xdeadcode.se
 
-import StringIO, urllib, signal
+import StringIO, urllib, signal, os, inspect, optparse
 from random import randint
 from time import sleep
 
@@ -96,29 +97,24 @@ signal.signal(signal.SIGINT, handler)
 ###################
 
 print 'Google subdomain scraper by Sam\n\nGooglesub will use google dorks to find subdomains without accessing the target domain.'
-
-queryurl =  str(raw_input('Only give the domain as input. Example: google.com\nWhich domain do you want to research? '))
-if not queryurl:
-	print 'Make up your mind.'
+filename = os.path.split(inspect.getfile(inspect.currentframe()))
+parser = optparse.OptionParser('Usage: Usage: %s <args>' 
+				'\n\nExample: python %s -u google.com -d -q 5'  % (filename[1], filename[1]))
+parser.add_option('-u', dest='queryurl', type='string', help='Research target')
+parser.add_option('-d', dest='delay', action='store_true', help='Adds delay to the script to avoid getting captcha (optional)')
+parser.add_option('-q', dest='queries', type='int', help='How many queries the script should do. Recommended: 6')
+(options, args) = parser.parse_args()
+queryurl = options.queryurl
+delay = options.delay
+queries = options.queries
+if queryurl == None or queries == None:
+	print parser.print_help()
 	quit()
+
 query = 'site:' + queryurl
-
-delay = raw_input ('Google likes to give bots captcha. To avoid this I can add a slight delay after each query.\nThis is recommended if you got a couple of domains to research.\nDo you want to use a slight delay (standard: yes)? ')
-if delay.upper() == 'YES' or delay.upper() == 'Y' or delay == '':
-	delay = True
-	print '[*] Delay activated'
-else:
-	delay = False
-	print '[*] Delay deactivated'
-
-queries = raw_input('\nHow many queries do you wish to do (default: 6)? ')
-if not queries:
-	queries = 6
-
 unique = []
 if delay:
 	print 'Estimated completion time: %d seconds' % (2*int(queries)*10)
-
 print 'Kill it with ctrl+c or let it finish.\nQuerying Google for \'%s\'.\nNow please wait while I invade google...' % query
 for num in xrange(0, int(queries)):
 	print 'Executing query %s of %s' % (str(num+1), str(queries))
@@ -138,7 +134,6 @@ for num in xrange(0, int(queries)):
 		sleep(2)	
 
 subdomains = sorted(list(set(subdomains)))
-
 print '\n##########################################\nFound %d subdomains on %s\n' % (len(subdomains), queryurl )
 for s in subdomains:
 	print s
