@@ -1,4 +1,4 @@
-#!/usr/bin/env py2
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # Coded by Sam (info@sam3.se)
 # http://0xdeadcode.se
