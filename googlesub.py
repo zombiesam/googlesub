@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env py2
 # -*- coding: utf-8 -*-
 # Coded by Sam (info@sam3.se)
 # http://0xdeadcode.se
@@ -10,13 +10,13 @@ from time import sleep
 try:
 	import requests
 except:
-	print 'Could not find requests\nPlease install and try again. Depending on your system pip might be called pip2.\npip install requests'
+	print 'Could not find requests (Python 2.x)\nPlease install and try again. Depending on your system pip might be called pip2.\npip install requests'
 	quit()
 
 try:
 	from bs4 import BeautifulSoup
 except:
-	print 'Could not find BeautifulSoup\nPlease install and try again. Depending on your system pip might be called pip2.\npip install BeautifulSoup4'
+	print 'Could not find BeautifulSoup4 (Python 2.x)\nPlease install and try again. Depending on your system pip might be called pip2.\npip install BeautifulSoup4'
 	quit()
 
 
