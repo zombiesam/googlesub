@@ -17,66 +17,50 @@ try:
 except:
 	exit('Could not find the library BeautifulSoup4 (Python 2.x)\nPlease install it and try again.')
 
-
 def getuseragent():
-    	ulist = []
-    	ufile = open('useragent_list.txt', 'r')
-    	for u in ufile.readlines():
-        	ulist.append(u.strip('\n'))
-    	return ulist
-    
+	return [line.rstrip('\n') for line in open('useragent_list.txt', 'r')]
+	
 try:
-    	useragentlist = getuseragent()
-    	print '[+] Successfully loaded %i user agent(s)' % len(useragentlist)
+	useragentlist = getuseragent()
+	print '[+] Successfully loaded %i user agent(s)' % len(useragentlist)
 except:
-    	print '[!] Something went terribly wrong when loading the user agent list. Does the file exist?'
-    	quit()
+	exit('[!] Something went terribly wrong when loading the user agent list. Does the file exist?')
 
 urls, links, subdomains = [[]] * 3
 
 def start_query(query, useragentlist, page):
 	global delay
-    	headers = {'User-Agent': useragentlist[(randint(1, len(useragentlist)))-1]}  
+	headers = {'User-Agent': useragentlist[(randint(1, len(useragentlist)))-1]}  
 	domain_list = ['.se', '.com']
 	links = []
 	for page in xrange(1, 10):
-        	r = requests.get('http://www.google.com/search?q=%s&safe=on&start=%i' % ( query, page), timeout = 5)
-        	html_container = BeautifulSoup(r.text)
-        	links += fix_links(html_container.find_all('a'))
+		r = requests.get('http://www.google.com/search?q=%s&safe=on&start=%i' % ( query, page), timeout = 5)
+		html_container = BeautifulSoup(r.text)
+		links += fix_links(html_container.find_all('a'))
 		if delay:
 			sleep(1)
 	if links:
-        	return links
-        else:
-        	pass
-    
+		return links
+	
 def fix_links(linkdata):
-    	links = []
-    	for link in linkdata:
-        	try:
-            		l = str(link).strip('\n').split('href=')[1].split('/url?q=')[1].split('"')[0]
-            		try:
-              		  	l = l.split('&amp;sa')[0]
-            		except:
-                		pass
-	            	if l.find('webcache.googleusercontent.com') == -1:
-        	        	l = urllib.unquote(l).decode('utf8')
-                		links.append(str(l))
-                		pass
-            		else:
-                		pass
-        	except:
-            		pass
-    	return links
+	links = []
+	for link in linkdata:
+		try:
+			l = str(link).strip('\n').split('href=')[1].split('/url?q=')[1].split('"')[0]
+			try:
+			  	l = l.split('&amp;sa')[0]
+			except:
+				pass
+			if l.find('webcache.googleusercontent.com') == -1:
+				l = urllib.unquote(l).decode('utf8')
+				links.append(str(l))
+		except:
+			pass
+	return links
 
 def strip(urls, queryurl):
-	returnquery = []
-	if len(urls) == 0:
-		pass
-	else:
-		for url in urls:
-			returnquery.append(url.split(queryurl)[0].split('//')[1] + queryurl)
-		return list(set(returnquery))
+	if len(urls):
+		return list(set([url.split(queryurl)[0].split('//')[1] + queryurl for url in urls]))
 
 ##################
 def handler(signum, frame): # http://stackoverflow.com/questions/1112343/how-do-i-capture-sigint-in-python
@@ -84,14 +68,11 @@ def handler(signum, frame): # http://stackoverflow.com/questions/1112343/how-do-
 	if subdomains:
 		subdomains = sorted(list(set(subdomains)))
 		print '\n\nFound %d subdomains:\n' % len(subdomains)
-		for s in subdomains:
-        		print s		
+		print '\n'.join(subdomains)
 
-	print '\nAlright, alright! Quitting...'
-	quit()
+	exit('CTRL+C pressed. Terminating.')
 
 signal.signal(signal.SIGINT, handler)
-
 ###################
 
 print 'Google subdomain scraper by Sam\n\nGooglesub will use google dorks to find subdomains without accessing the target domain.'
@@ -106,8 +87,7 @@ queryurl = options.queryurl
 delay = options.delay
 queries = options.queries
 if queryurl == None or queries == None:
-	print parser.print_help()
-	quit()
+	exit(parser.print_help())
 
 query = 'site:' + queryurl
 unique = []
@@ -119,13 +99,9 @@ for num in xrange(0, int(queries)):
 	links = start_query(query, useragentlist, num)
 	if links:
 		subdomains += strip(links, queryurl)
-	else:
-		pass
 	if subdomains:
 		for s in subdomains:
-			if s in unique:
-				pass
-			else:
+			if s not in unique:
 				query += '+-site:%s' % s
 				unique.append(s)
 	if delay:
@@ -133,6 +109,5 @@ for num in xrange(0, int(queries)):
 
 subdomains = sorted(list(set(subdomains)))
 print '\n##########################################\nFound %d subdomains on %s\n' % (len(subdomains), queryurl )
-for s in subdomains:
-	print s
+print '\n'.join(kalle)
 print '\n##########################################\nDone. Quitting...\n'
