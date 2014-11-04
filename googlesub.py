@@ -109,5 +109,5 @@ for num in xrange(0, int(queries)):
 
 subdomains = sorted(list(set(subdomains)))
 print '\n##########################################\nFound %d subdomains on %s\n' % (len(subdomains), queryurl )
-print '\n'.join(kalle)
+print '\n'.join(subdomains)
 print '\n##########################################\nDone. Quitting...\n'
