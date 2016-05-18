@@ -35,7 +35,7 @@ def start_query(query, useragentlist, page):
 	links = []
 	for page in xrange(1, 10):
 		r = requests.get('http://www.google.com/search?q=%s&safe=on&start=%i' % ( query, page), timeout = 5)
-		html_container = BeautifulSoup(r.text)
+		html_container = BeautifulSoup(r.text, 'lxml')
 		links += fix_links(html_container.find_all('a'))
 		if delay:
 			sleep(1)
